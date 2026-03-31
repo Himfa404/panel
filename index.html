@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LE PANEL - Gestion de Stock</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="min-h-screen p-4 md:p-8">
+        <div class="max-w-5xl mx-auto">
+            <!-- Header -->
+            <header class="header-section">
+                <div class="header-content">
+                    <div class="header-actions">
+                        <button id="toggle-history-btn" class="theme-toggle">
+                            <i class="fas fa-history"></i>
+                        </button>
+                        <button id="theme-toggle" class="theme-toggle">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </div>
+                    <div class="header-text">
+                        <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">
+                            <i class="fas fa-chart-line"></i> LE PANEL
+                        </h1>
+                        <p class="text-purple-300 text-lg">Gestion de stock en temps réel</p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-beer"></i>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Total Boissons</p>
+                        <p class="stat-value" id="total-drinks">0</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card success">
+                    <div class="stat-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Valeur Stock</p>
+                        <p class="stat-value" id="total-value">0 FCFA</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card info">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Bénéfices Totaux</p>
+                        <p class="stat-value" id="total-profit">0 FCFA</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Button -->
+            <div class="mb-6">
+                <button id="toggle-form-btn" class="w-full btn-primary rounded-xl p-4 font-semibold flex items-center justify-center gap-2">
+                    <i class="fas fa-plus"></i>
+                    Ajouter une boisson
+                </button>
+            </div>
+
+            <!-- Add Form -->
+            <div id="add-form" class="hidden mb-6">
+                <div class="form-card">
+                    <h3 class="form-title">
+                        <i class="fas fa-plus-circle"></i>
+                        Nouvelle Boisson
+                    </h3>
+                    <div class="form-row">
+                        <input
+                            type="text"
+                            id="drink-name"
+                            placeholder="Nom de la boisson"
+                            class="form-input"
+                        />
+                        <input
+                            type="number"
+                            step="0.01"
+                            id="drink-purchase-price"
+                            placeholder="Prix d'achat (FCFA)"
+                            class="form-input"
+                        />
+                        <input
+                            type="number"
+                            step="0.01"
+                            id="drink-sale-price"
+                            placeholder="Prix de vente (FCFA)"
+                            class="form-input"
+                        />
+                        <input
+                            type="number"
+                            id="drink-quantity"
+                            placeholder="Quantité"
+                            class="form-input"
+                        />
+                    </div>
+                    <div class="form-actions">
+                        <button
+                            id="save-drink-btn"
+                            class="btn-primary"
+                        >
+                            <i class="fas fa-save"></i>
+                            Enregistrer
+                        </button>
+                        <button
+                            id="cancel-btn"
+                            class="btn-secondary"
+                        >
+                            <i class="fas fa-times"></i>
+                            Annuler
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Drink List -->
+            <div id="drinks-list" class="space-y-4">
+                <!-- Les boissons seront ajoutées ici dynamiquement -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state hidden">
+                <div class="empty-state-icon">
+                    <i class="fas fa-beer"></i>
+                </div>
+                <h3 class="empty-state-title">Aucune boisson dans le stock</h3>
+                <p class="empty-state-description">Commencez par ajouter votre première boisson pour gérer votre inventaire</p>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <p><i class="fas fa-chart-line"></i> LE PANEL - Gestion de stock pour bars</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="history-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content history-modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-history"></i>
+                    Historique des mouvements
+                </h3>
+                <button class="modal-close" id="history-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="history-list" class="history-list-container">
+                    <!-- Les entrées d'historique seront ajoutées ici dynamiquement -->
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" id="clear-history-btn">
+                    <i class="fas fa-trash"></i>
+                    Vider l'historique
+                </button>
+                <button class="btn-secondary" id="history-modal-cancel">
+                    <i class="fas fa-times"></i>
+                    Fermer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Confirmation de suppression
+                </h3>
+                <button class="modal-close" id="delete-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-message">
+                    Êtes-vous sûr de vouloir supprimer "<span id="delete-drink-name"></span>" ?
+                </p>
+                <p class="modal-warning">
+                    Cette action est irréversible.
+                </p>
+            </div>
+            <div class="modal-actions">
+                <button id="confirm-delete-btn" class="btn-primary delete">
+                    <i class="fas fa-trash"></i>
+                    Supprimer
+                </button>
+                <button id="cancel-delete-btn" class="btn-secondary">
+                    <i class="fas fa-times"></i>
+                    Annuler
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification hidden">
+        <div class="notification-content">
+            <i class="notification-icon"></i>
+            <p class="notification-message" id="notification-message"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
