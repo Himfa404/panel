@@ -177,6 +177,82 @@
         </div>
     </div>
 
+    <!-- Quantity Modal for Selling -->
+    <div id="sell-quantity-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-shopping-cart"></i>
+                    Vente personnalisée
+                </h3>
+                <button class="modal-close" id="sell-quantity-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-message">
+                    Combien d'unités de "<span id="sell-drink-name"></span>" voulez-vous vendre ?
+                </p>
+                <div class="form-group">
+                    <label for="sell-quantity-input">Quantité</label>
+                    <input type="number" id="sell-quantity-input" class="form-input" min="1" max="999" value="1">
+                </div>
+                <p class="modal-info">
+                    Stock disponible : <span id="sell-available-stock">0</span> unités
+                </p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" id="confirm-sell-quantity">
+                    <i class="fas fa-check"></i>
+                    Confirmer la vente
+                </button>
+                <button class="btn-secondary" id="cancel-sell-quantity">
+                    <i class="fas fa-times"></i>
+                    Annuler
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quantity Modal for Restocking -->
+    <div id="restock-quantity-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-plus-circle"></i>
+                    Réapprovisionnement personnalisé
+                </h3>
+                <button class="modal-close" id="restock-quantity-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-message">
+                    Combien d'unités de "<span id="restock-drink-name"></span>" voulez-vous ajouter ?
+                </p>
+                <div class="form-group">
+                    <label for="restock-quantity-input">Quantité</label>
+                    <input type="number" id="restock-quantity-input" class="form-input" min="1" max="999" value="1">
+                </div>
+                <p class="modal-info">
+                    Stock actuel : <span id="restock-current-stock">0</span> unités
+                </p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" id="confirm-restock-quantity">
+                    <i class="fas fa-check"></i>
+                    Confirmer l'ajout
+                </button>
+                <button class="btn-secondary" id="cancel-restock-quantity">
+                    <i class="fas fa-times"></i>
+                    Annuler
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Delete Confirmation Modal -->
     <div id="delete-modal" class="modal hidden">
         <div class="modal-overlay"></div>

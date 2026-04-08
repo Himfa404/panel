@@ -20,6 +20,9 @@ let showHistory = false;
 let drinkToDelete = null;
 let currentPage = 1;
 const itemsPerPage = 10;
+// Long press state
+let longPressTimer = null;
+let selectedDrinkForQuantity = null;
 
 // DOM Elements
 const elements = {
@@ -47,6 +50,21 @@ const elements = {
     notification: document.getElementById('notification'),
     notificationMessage: document.getElementById('notification-message'),
     themeToggle: document.getElementById('theme-toggle'),
+    // Quantity modals elements
+    sellQuantityModal: document.getElementById('sell-quantity-modal'),
+    sellQuantityModalClose: document.getElementById('sell-quantity-modal-close'),
+    sellDrinkName: document.getElementById('sell-drink-name'),
+    sellQuantityInput: document.getElementById('sell-quantity-input'),
+    sellAvailableStock: document.getElementById('sell-available-stock'),
+    confirmSellQuantity: document.getElementById('confirm-sell-quantity'),
+    cancelSellQuantity: document.getElementById('cancel-sell-quantity'),
+    restockQuantityModal: document.getElementById('restock-quantity-modal'),
+    restockQuantityModalClose: document.getElementById('restock-quantity-modal-close'),
+    restockDrinkName: document.getElementById('restock-drink-name'),
+    restockQuantityInput: document.getElementById('restock-quantity-input'),
+    restockCurrentStock: document.getElementById('restock-current-stock'),
+    confirmRestockQuantity: document.getElementById('confirm-restock-quantity'),
+    cancelRestockQuantity: document.getElementById('cancel-restock-quantity'),
     // Delete modal elements
     deleteModal: document.getElementById('delete-modal'),
     deleteModalClose: document.getElementById('delete-modal-close'),
@@ -280,6 +298,91 @@ function clearHistory() {
     }
 }
 
+// Long press handlers
+function handleLongPressStart(drink, action) {
+    selectedDrinkForQuantity = { drink, action };
+    longPressTimer = setTimeout(() => {
+        showQuantityModal(drink, action);
+    }, 500); // 500ms for long press
+}
+
+function handleLongPressEnd() {
+    if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+    }
+}
+
+// Show quantity modal
+function showQuantityModal(drink, action) {
+    selectedDrinkForQuantity = { drink, action };
+    
+    if (action === 'sell') {
+        elements.sellDrinkName.textContent = drink.nom;
+        elements.sellAvailableStock.textContent = drink.quantite;
+        elements.sellQuantityInput.value = 1;
+        elements.sellQuantityInput.max = drink.quantite;
+        elements.sellQuantityModal.classList.remove('hidden');
+        elements.sellQuantityInput.focus();
+    } else if (action === 'restock') {
+        elements.restockDrinkName.textContent = drink.nom;
+        elements.restockCurrentStock.textContent = drink.quantite;
+        elements.restockQuantityInput.value = 1;
+        elements.restockQuantityModal.classList.remove('hidden');
+        elements.restockQuantityInput.focus();
+    }
+}
+
+// Hide quantity modals
+function hideSellQuantityModal() {
+    elements.sellQuantityModal.classList.add('hidden');
+    selectedDrinkForQuantity = null;
+}
+
+function hideRestockQuantityModal() {
+    elements.restockQuantityModal.classList.add('hidden');
+    selectedDrinkForQuantity = null;
+}
+
+// Confirm quantity actions
+function confirmSellQuantity() {
+    if (!selectedDrinkForQuantity) return;
+    
+    const quantity = parseInt(elements.sellQuantityInput.value);
+    const drink = selectedDrinkForQuantity.drink;
+    
+    if (isNaN(quantity) || quantity < 1 || quantity > drink.quantite) {
+        showNotification('Quantité invalide', 'error');
+        return;
+    }
+    
+    drink.quantite -= quantity;
+    saveDrinks();
+    addToHistory('sale', drink.nom, quantity, drink.prixVente);
+    hideSellQuantityModal();
+    render();
+    showNotification(`Vente: ${quantity}x ${drink.nom}`, 'success');
+}
+
+function confirmRestockQuantity() {
+    if (!selectedDrinkForQuantity) return;
+    
+    const quantity = parseInt(elements.restockQuantityInput.value);
+    const drink = selectedDrinkForQuantity.drink;
+    
+    if (isNaN(quantity) || quantity < 1) {
+        showNotification('Quantité invalide', 'error');
+        return;
+    }
+    
+    drink.quantite += quantity;
+    saveDrinks();
+    addToHistory('restock', drink.nom, quantity, drink.prixAchat);
+    hideRestockQuantityModal();
+    render();
+    showNotification(`Réapprovisionnement: +${quantity}x ${drink.nom}`, 'success');
+}
+
 // Setup event listeners
 function setupEventListeners() {
     elements.toggleFormBtn.addEventListener('click', toggleForm);
@@ -295,6 +398,25 @@ function setupEventListeners() {
     elements.historyModal.addEventListener('click', (e) => {
         if (e.target === elements.historyModal) {
             hideHistoryModal();
+        }
+    });
+    
+    // Quantity modals event listeners
+    elements.sellQuantityModalClose.addEventListener('click', hideSellQuantityModal);
+    elements.cancelSellQuantity.addEventListener('click', hideSellQuantityModal);
+    elements.confirmSellQuantity.addEventListener('click', confirmSellQuantity);
+    elements.sellQuantityModal.addEventListener('click', (e) => {
+        if (e.target === elements.sellQuantityModal) {
+            hideSellQuantityModal();
+        }
+    });
+    
+    elements.restockQuantityModalClose.addEventListener('click', hideRestockQuantityModal);
+    elements.cancelRestockQuantity.addEventListener('click', hideRestockQuantityModal);
+    elements.confirmRestockQuantity.addEventListener('click', confirmRestockQuantity);
+    elements.restockQuantityModal.addEventListener('click', (e) => {
+        if (e.target === elements.restockQuantityModal) {
+            hideRestockQuantityModal();
         }
     });
     
@@ -523,17 +645,27 @@ function createDrinkElement(drink, index) {
 
         <div class="drink-actions">
             <button
-                onclick="restockDrink(${drink.id})"
+                onmousedown="handleLongPressStart(drinks[${index}], 'restock')"
+                onmouseup="handleLongPressEnd()"
+                onmouseleave="handleLongPressEnd()"
+                ontouchstart="handleLongPressStart(drinks[${index}], 'restock')"
+                ontouchend="handleLongPressEnd()"
+                onclick="if (!longPressTimer) restockDrink(${drink.id})"
                 class="action-btn restock"
-                title="Réapprovisionner"
+                title="Réapprovisionner (appui long pour quantité personnalisée)"
             >
                 <i class="fas fa-plus"></i>
             </button>
             <button
-                onclick="sellDrink(${drink.id})"
+                onmousedown="handleLongPressStart(drinks[${index}], 'sell')"
+                onmouseup="handleLongPressEnd()"
+                onmouseleave="handleLongPressEnd()"
+                ontouchstart="handleLongPressStart(drinks[${index}], 'sell')"
+                ontouchend="handleLongPressEnd()"
+                onclick="if (!longPressTimer) sellDrink(${drink.id})"
                 ${drink.quantite <= 0 ? 'disabled' : ''}
                 class="action-btn sell"
-                title="Vendre"
+                title="Vendre (appui long pour quantité personnalisée)"
             >
                 <i class="fas fa-shopping-cart"></i>
             </button>
@@ -581,6 +713,10 @@ window.restockDrink = restockDrink;
 window.sellDrink = sellDrink;
 window.clearAllData = clearAllData;
 window.clearHistory = clearHistory;
+window.handleLongPressStart = handleLongPressStart;
+window.handleLongPressEnd = handleLongPressEnd;
+window.confirmSellQuantity = confirmSellQuantity;
+window.confirmRestockQuantity = confirmRestockQuantity;
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', init);

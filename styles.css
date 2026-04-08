@@ -1384,3 +1384,57 @@ body.dark-theme .history-list-container::-webkit-scrollbar-thumb {
         font-size: 1.875rem;
     }
 }
+
+/* Quantity Modal Styles */
+.modal-info {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: var(--light-bg);
+    border-radius: 0.375rem;
+    border-left: 3px solid var(--primary-color);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    background: var(--surface-bg);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+body.dark-theme .form-input {
+    background: var(--light-bg);
+    border-color: var(--border-color);
+}
+
+body.dark-theme .form-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+body.dark-theme .modal-info {
+    background: var(--surface-bg);
+    border-left-color: var(--primary-color);
+}
