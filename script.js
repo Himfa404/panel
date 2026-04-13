@@ -23,6 +23,9 @@ const itemsPerPage = 10;
 // Long press state
 let longPressTimer = null;
 let selectedDrinkForQuantity = null;
+// Search state
+let searchQuery = '';
+let filteredDrinks = [];
 
 // DOM Elements
 const elements = {
@@ -50,6 +53,10 @@ const elements = {
     notification: document.getElementById('notification'),
     notificationMessage: document.getElementById('notification-message'),
     themeToggle: document.getElementById('theme-toggle'),
+    // Search elements
+    searchInput: document.getElementById('search-input'),
+    clearSearchBtn: document.getElementById('clear-search-btn'),
+    searchResults: document.getElementById('search-results'),
     // Quantity modals elements
     sellQuantityModal: document.getElementById('sell-quantity-modal'),
     sellQuantityModalClose: document.getElementById('sell-quantity-modal-close'),
@@ -383,6 +390,53 @@ function confirmRestockQuantity() {
     showNotification(`Réapprovisionnement: +${quantity}x ${drink.nom}`, 'success');
 }
 
+// Search functions
+function handleSearch() {
+    searchQuery = elements.searchInput.value.toLowerCase().trim();
+    
+    if (searchQuery === '') {
+        filteredDrinks = [...drinks];
+        elements.searchResults.innerHTML = '';
+        elements.searchResults.classList.add('hidden');
+    } else {
+        filteredDrinks = drinks.filter(drink => 
+            drink.nom.toLowerCase().includes(searchQuery)
+        );
+        displaySearchResults();
+    }
+    
+    render();
+}
+
+function displaySearchResults() {
+    if (filteredDrinks.length === 0) {
+        elements.searchResults.innerHTML = `
+            <div class="search-no-results">
+                <i class="fas fa-search"></i>
+                <p>Aucune boisson trouvée pour "${searchQuery}"</p>
+            </div>
+        `;
+        elements.searchResults.classList.remove('hidden');
+    } else {
+        elements.searchResults.innerHTML = `
+            <div class="search-results-summary">
+                <i class="fas fa-filter"></i>
+                <span>${filteredDrinks.length} boisson${filteredDrinks.length > 1 ? 's' : ''} trouvée${filteredDrinks.length > 1 ? 's' : ''}</span>
+            </div>
+        `;
+        elements.searchResults.classList.remove('hidden');
+    }
+}
+
+function clearSearch() {
+    elements.searchInput.value = '';
+    searchQuery = '';
+    filteredDrinks = [...drinks];
+    elements.searchResults.innerHTML = '';
+    elements.searchResults.classList.add('hidden');
+    render();
+}
+
 // Setup event listeners
 function setupEventListeners() {
     elements.toggleFormBtn.addEventListener('click', toggleForm);
@@ -390,6 +444,15 @@ function setupEventListeners() {
     elements.saveDrinkBtn.addEventListener('click', addDrink);
     elements.cancelBtn.addEventListener('click', hideForm);
     elements.themeToggle?.addEventListener('click', toggleTheme);
+    
+    // Search event listeners
+    elements.searchInput.addEventListener('input', handleSearch);
+    elements.clearSearchBtn.addEventListener('click', clearSearch);
+    elements.searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            clearSearch();
+        }
+    });
     
     // History modal event listeners
     elements.historyModalClose.addEventListener('click', hideHistoryModal);
@@ -685,26 +748,25 @@ function createDrinkElement(drink, index) {
 // Render the app
 function render() {
     console.log('render called, drinks length:', drinks.length);
-    // Clear current list
-    elements.drinksList.innerHTML = '';
-
-    // Update stats
-    updateStats();
-
-    // Show/hide empty state
-    if (drinks.length === 0) {
+    
+    // Use filtered drinks if search is active, otherwise use all drinks
+    const drinksToRender = searchQuery ? filteredDrinks : drinks;
+    
+    if (drinksToRender.length === 0) {
+        elements.drinksList.innerHTML = '';
         elements.emptyState.classList.remove('hidden');
-        elements.emptyState.classList.add('animate-fade-in');
-    } else {
-        elements.emptyState.classList.add('hidden');
-
-        // Render drinks
-        drinks.forEach((drink, index) => {
-            console.log('Rendering drink:', drink);
-            const drinkElement = createDrinkElement(drink, index);
-            elements.drinksList.appendChild(drinkElement);
-        });
+        return;
     }
+    
+    elements.emptyState.classList.add('hidden');
+    elements.drinksList.innerHTML = '';
+    
+    drinksToRender.forEach((drink, index) => {
+        const drinkElement = createDrinkElement(drink, index);
+        elements.drinksList.appendChild(drinkElement);
+    });
+    
+    updateStats();
 }
 
 // Make functions globally accessible for onclick handlers
@@ -717,6 +779,8 @@ window.handleLongPressStart = handleLongPressStart;
 window.handleLongPressEnd = handleLongPressEnd;
 window.confirmSellQuantity = confirmSellQuantity;
 window.confirmRestockQuantity = confirmRestockQuantity;
+window.handleSearch = handleSearch;
+window.clearSearch = clearSearch;
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', init);

@@ -1438,3 +1438,119 @@ body.dark-theme .modal-info {
     background: var(--surface-bg);
     border-left-color: var(--primary-color);
 }
+
+/* Search Styles */
+.search-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--surface-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.search-input-wrapper:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.search-icon {
+    color: var(--text-muted);
+    margin-right: 0.75rem;
+    font-size: 1rem;
+}
+
+.search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    padding: 0.25rem;
+}
+
+.search-input::placeholder {
+    color: var(--text-muted);
+}
+
+.clear-search-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    margin-left: 0.5rem;
+    border-radius: 0.25rem;
+    transition: all 0.3s ease;
+}
+
+.clear-search-btn:hover {
+    color: var(--text-secondary);
+    background: var(--light-bg);
+}
+
+.search-results {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background: var(--surface-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+}
+
+.search-no-results {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    padding: 0.5rem;
+}
+
+.search-results-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    padding: 0.5rem;
+}
+
+.search-results i {
+    color: var(--primary-color);
+}
+
+/* Dark theme search styles */
+body.dark-theme .search-input-wrapper {
+    background: var(--light-bg);
+    border-color: var(--border-color);
+}
+
+body.dark-theme .search-input-wrapper:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+body.dark-theme .search-input {
+    color: var(--text-primary);
+}
+
+body.dark-theme .search-input::placeholder {
+    color: var(--text-muted);
+}
+
+body.dark-theme .clear-search-btn:hover {
+    color: var(--text-secondary);
+    background: var(--surface-bg);
+}
+
+body.dark-theme .search-results {
+    background: var(--light-bg);
+    border-color: var(--border-color);
+}
